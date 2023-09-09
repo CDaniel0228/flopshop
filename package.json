@@ -1,0 +1,32 @@
+{
+  "name": "gestion",
+  "version": "1.0.0",
+  "description": "Gestion de proyectos",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/storage": "^6.7.0",
+    "alert": "^5.1.1",
+    "build": "^0.1.4",
+    "dotenv": "^11.0.0",
+    "ejs": "^3.1.8",
+    "express": "^4.17.2",
+    "express-handlebars": "^6.0.2",
+    "express-validator": "^6.14.2",
+    "file-system": "^2.2.2",
+    "firebase": "^9.23.0",
+    "firebase-admin": "^10.0.1",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "sweetalert2": "^11.6.14"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
