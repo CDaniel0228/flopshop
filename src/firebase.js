@@ -1,6 +1,6 @@
 require("dotenv").config();
   const { initializeApp } =require("firebase/app");
-const { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithPopup, signInWithRedirect} = require("firebase/auth");
+const { getAuth} = require("firebase/auth");
 
 const firebaseConfig = {
   apiKey: "AIzaSyBkqzyZGASrTROj1uPl69EZJfhG1QDAXOI",

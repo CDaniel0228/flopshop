@@ -11,6 +11,10 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
 </head>
 
 <body>
@@ -32,16 +36,19 @@
             <!-- Pills content -->
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="pills-login" role="tabpanel" aria-labelledby="tab-login">
-                    <form action="/login" method="POST" >
+                    <form action="/login" method="POST">
                         <div class="text-center mb-3">
                             <p>Sign in with:</p>
-                            <button type="submit" name="action" value="facebook" class="btn btn-link btn-floating mx-1">
-                                <i class="fab fa-facebook-f"></i>
-                            </button>
+                            <fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
+                            </fb:login-button>
 
-                            <button type="submit" name="action" value="google" class="btn btn-link btn-floating mx-1">
-                                <i class="fab fa-google"></i>
-                            </button>
+                            <div id="g_id_onload"
+                                data-client_id="28291341601-4o1mkblen964d1i5efm0vs0f6ufmlr5e.apps.googleusercontent.com"
+                                data-callback="handleCredentialResponse">
+                            </div>
+                            <div class="g_id_signin" data-type="icon" data-shape="square" data-theme="outline"
+                                data-text="signin_with" data-size="large">
+                            </div>
 
                         </div>
 
@@ -54,7 +61,8 @@
 
                         <!-- Password input -->
                         <div class="form-outline mb-4">
-                            <input type="password" id="loginPassword" placeholder="Contraseña" name="password" class="form-control" />
+                            <input type="password" id="loginPassword" placeholder="Contraseña" name="password"
+                                class="form-control" />
                         </div>
 
                         <!-- 2 column grid layout -->
@@ -136,7 +144,135 @@
                 </div>
             </div>
         </div>
+        <%- include('./foot') %>
         <!-- Pills content -->
+        <script>
+            function handleCredentialResponse(response) {
+                const idToken = response.credential; // Corregir la obtención del ID token
+
+                // Crear un objeto de datos que contiene el id_token
+                const data = { id_token: idToken };
+
+                // Realizar una solicitud POST al servidor
+                fetch('/gom', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                })
+                    .then((response) => {
+                        // Verificar el tipo de contenido de la respuesta
+                        const contentType = response.headers.get('Content-Type');
+                
+                        if (contentType && contentType.includes('application/json')) {
+                            // Si la respuesta es JSON, analízala como tal
+                            return response.json();
+                        } else {
+                            // Si no es JSON, maneja la respuesta de otra manera (por ejemplo, como texto)
+                            return response.text();
+                        }
+                    })
+                    .then((data) => {
+                        // Procesar la respuesta según su tipo
+                        if (typeof data === 'object') {
+                            // Si es un objeto JSON
+                            console.log(data);
+                            alert("¡La función handleCredentialResponse se ejecutó! " + idToken);
+                        } else {
+                            // Si es otro tipo de contenido (por ejemplo, texto)
+                            console.log(data);
+                            alert("¡La función handleCredentialResponse se ejecutó! (No era JSON)");
+                            window.location.href = '/formulario';
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error al realizar la solicitud POST:', error);
+                    });
+                
+            }
+
+            function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
+                console.log('statusChangeCallback');
+                console.log(response);                   // The current login status of the person.
+                if (response.status === 'connected') {   // Logged into your webpage and Facebook.
+                    testAPI();
+                } else {                                 // Not logged into your webpage or we are unable to tell.
+                    document.getElementById('status').innerHTML = 'Please log ' +
+                        'into this webpage.';
+                }
+            }
+
+
+            function checkLoginState() {               // Called when a person is finished with the Login Button.
+                FB.getLoginStatus(function (response) {   // See the onlogin handler
+                    statusChangeCallback(response);
+                    const idToken = response.authResponse; // Corregir la obtención del ID token
+
+                    // Crear un objeto de datos que contiene el id_token
+                    const data = { id_token: idToken };
+                    fetch('/facebook', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data),
+                    })
+                        .then((response) => {
+                            // Verificar el tipo de contenido de la respuesta
+                            const contentType = response.headers.get('Content-Type');
+                    
+                            if (contentType && contentType.includes('application/json')) {
+                                // Si la respuesta es JSON, analízala como tal
+                                return response.json();
+                            } else {
+                                // Si no es JSON, maneja la respuesta de otra manera (por ejemplo, como texto)
+                                return response.text();
+                            }
+                        })
+                        .then((data) => {
+                            // Procesar la respuesta según su tipo
+                            if (typeof data === 'object') {
+                                // Si es un objeto JSON
+                                console.log(data);
+                                alert("¡La función handleCredentialResponse se ejecutó! " + idToken);
+                            } else {
+                                // Si es otro tipo de contenido (por ejemplo, texto)
+                                console.log(data);
+                                alert("¡La función handleCredentialResponse se ejecutó! (No era JSON)");
+                                window.location.href = '/formulario';
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('Error al realizar la solicitud POST:', error);
+                        });
+                });
+            }
+
+
+            window.fbAsyncInit = function () {
+                FB.init({
+                    appId: '987368722542264',
+                    cookie: true,                     // Enable cookies to allow the server to access the session.
+                    xfbml: true,                     // Parse social plugins on this webpage.
+                    version: 'v18.0'           // Use this Graph API version for this call.
+                });
+
+
+                FB.getLoginStatus(function (response) {   // Called after the JS SDK has been initialized.
+                    statusChangeCallback(response);        // Returns the login status.
+                });
+            };
+
+            function testAPI() {                      // Testing Graph API after login.  See statusChangeCallback() for when this call is made.
+                console.log('Welcome!  Fetching your information.... ');
+                FB.api('/me', function (response) {
+                    console.log('Successful login for: ' + response.name);
+                    document.getElementById('status').innerHTML =
+                        'Thanks for logging in, ' + response.name + '!';
+                });
+            }
+        </script>
 
 </body>
 
